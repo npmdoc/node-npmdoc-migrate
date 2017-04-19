@@ -63,6 +63,15 @@
 
         <li>
 
+            <a class="apidocElementLiA" href="#apidoc.element.migrate.migrate">
+            function <span class="apidocSignatureSpan"></span>migrate
+            <span class="apidocSignatureSpan">(title, up, down)</span>
+            </a>
+
+        </li>
+
+        <li>
+
             <a class="apidocElementLiA" href="#apidoc.element.migrate.load">
             function <span class="apidocSignatureSpan">migrate.</span>load
             <span class="apidocSignatureSpan">(stateFile, migrationsDirectory)</span>
@@ -82,6 +91,28 @@
         <li>
 
             <span class="apidocSignatureSpan">object <span class="apidocSignatureSpan">migrate.</span>set.prototype</span>
+
+        </li>
+
+    </ol></li>
+
+    <li class="apidocModuleLi"><a href="#apidoc.module.migrate.migrate">module migrate.migrate</a><ol>
+
+        <li>
+
+            <a class="apidocElementLiA" href="#apidoc.element.migrate.migrate.migrate">
+            function <span class="apidocSignatureSpan">migrate.</span>migrate
+            <span class="apidocSignatureSpan">(title, up, down)</span>
+            </a>
+
+        </li>
+
+        <li>
+
+            <a class="apidocElementLiA" href="#apidoc.element.migrate.migrate.load">
+            function <span class="apidocSignatureSpan">migrate.migrate.</span>load
+            <span class="apidocSignatureSpan">(stateFile, migrationsDirectory)</span>
+            </a>
 
         </li>
 
@@ -174,6 +205,49 @@
 
 
     <h2>
+        <a href="#apidoc.element.migrate.migrate" id="apidoc.element.migrate.migrate">
+        function <span class="apidocSignatureSpan"></span>migrate
+        <span class="apidocSignatureSpan">(title, up, down)</span>
+        </a>
+    </h2>
+    <ul>
+    <li>description and source-code<pre class="apidocCodePre">function migrate(title, up, down) {
+  // migration
+  if (&#x27;string&#x27; == typeof title &#x26;&#x26; up &#x26;&#x26; down) {
+    migrate.set.addMigration(title, up, down);
+  // specify migration file
+  } else if (&#x27;string&#x27; == typeof title) {
+    migrate.set = new Set(title);
+  // no migration path
+  } else if (!migrate.set) {
+    throw new Error(&#x27;must invoke migrate(path) before running migrations&#x27;);
+  // run migrations
+  } else {
+    return migrate.set;
+  }
+}</pre></li>
+    <li>example usage<pre class="apidocCodePre">...
+* Run down migrations and call `fn(err)`.
+*
+* @param {Function} fn
+* @api public
+*/
+
+Set.prototype.down = function(migrationName, fn){
+ this.<span class="apidocCodeKeywordSpan">migrate</span>(&#x27;down&#x27;, migrationName, fn);
+};
+
+/**
+* Run up migrations and call `fn(err)`.
+*
+* @param {Function} fn
+* @api public
+...</pre></li>
+    </ul>
+
+
+
+    <h2>
         <a href="#apidoc.element.migrate.load" id="apidoc.element.migrate.load">
         function <span class="apidocSignatureSpan">migrate.</span>load
         <span class="apidocSignatureSpan">(stateFile, migrationsDirectory)</span>
@@ -231,6 +305,96 @@ set.up(function (err) {
     </ul>
 
 
+
+
+</div>
+
+<div class="apidocSectionDiv">
+<h1><a href="#apidoc.module.migrate.migrate" id="apidoc.module.migrate.migrate">module migrate.migrate</a></h1>
+
+
+    <h2>
+        <a href="#apidoc.element.migrate.migrate.migrate" id="apidoc.element.migrate.migrate.migrate">
+        function <span class="apidocSignatureSpan">migrate.</span>migrate
+        <span class="apidocSignatureSpan">(title, up, down)</span>
+        </a>
+    </h2>
+    <ul>
+    <li>description and source-code<pre class="apidocCodePre">function migrate(title, up, down) {
+  // migration
+  if (&#x27;string&#x27; == typeof title &#x26;&#x26; up &#x26;&#x26; down) {
+    migrate.set.addMigration(title, up, down);
+  // specify migration file
+  } else if (&#x27;string&#x27; == typeof title) {
+    migrate.set = new Set(title);
+  // no migration path
+  } else if (!migrate.set) {
+    throw new Error(&#x27;must invoke migrate(path) before running migrations&#x27;);
+  // run migrations
+  } else {
+    return migrate.set;
+  }
+}</pre></li>
+    <li>example usage<pre class="apidocCodePre">...
+* Run down migrations and call `fn(err)`.
+*
+* @param {Function} fn
+* @api public
+*/
+
+Set.prototype.down = function(migrationName, fn){
+ this.<span class="apidocCodeKeywordSpan">migrate</span>(&#x27;down&#x27;, migrationName, fn);
+};
+
+/**
+* Run up migrations and call `fn(err)`.
+*
+* @param {Function} fn
+* @api public
+...</pre></li>
+    </ul>
+
+
+
+    <h2>
+        <a href="#apidoc.element.migrate.migrate.load" id="apidoc.element.migrate.migrate.load">
+        function <span class="apidocSignatureSpan">migrate.migrate.</span>load
+        <span class="apidocSignatureSpan">(stateFile, migrationsDirectory)</span>
+        </a>
+    </h2>
+    <ul>
+    <li>description and source-code<pre class="apidocCodePre">load = function (stateFile, migrationsDirectory) {
+
+  var set = new Set(stateFile);
+  var dir = path.resolve(migrationsDirectory);
+
+  fs.readdirSync(dir).filter(function(file){
+    return file.match(/^\d+.*\.js$/);
+  }).sort().forEach(function (file) {
+    var mod = require(path.join(dir, file));
+    set.addMigration(file, mod.up, mod.down);
+  });
+
+  return set;
+}</pre></li>
+    <li>example usage<pre class="apidocCodePre">...
+
+```
+
+## Programmatic usage
+
+```javascript
+var migrate = require(&#x27;migrate&#x27;);
+var set = migrate.<span class="apidocCodeKeywordSpan">load</span>(&#x27;migration/.migrate&#x27;, &#x27;migration&#x27;);
+
+set.up(function (err) {
+  if (err) throw err;
+
+  console.log(&#x27;Migration completed&#x27;);
+});
+```
+...</pre></li>
+    </ul>
 
 
 </div>
